@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090909">
+<title>REEL TAB | Social video and profile</title>
+<style>
+:root{--bg:#090909;--panel:#151515;--line:#303030;--muted:#aaa;--pink:#ff2348;--green:#9ee6ad}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font:15px Arial,sans-serif}
+header{height:62px;padding:16px 18px;border-bottom:1px solid #292929;font-size:25px;font-weight:900;position:sticky;top:0;background:#090909;z-index:5}
+header span{color:var(--pink)}main{max-width:650px;margin:20px auto;padding:0 14px 50px}
+.card{background:var(--panel);border:1px solid #333;border-radius:18px;padding:20px;margin-bottom:16px}
+h1,h2,h3,p{margin-top:0}h1{font-size:27px;margin-bottom:8px}h2{font-size:20px}.muted{color:var(--muted);line-height:1.5}
+label{display:block;margin:14px 0 6px;color:#ddd;font-size:13px}
+input,textarea{width:100%;padding:13px;border-radius:10px;border:1px solid #444;background:#090909;color:#fff;font-size:16px}
+textarea{min-height:76px;resize:vertical}
+button{padding:12px 15px;border:0;border-radius:11px;background:var(--pink);color:#fff;font-weight:bold;font-size:15px;cursor:pointer}
+button.alt{background:#252525;border:1px solid #444}button.small{padding:9px 12px;font-size:13px}
+button:disabled{opacity:.5;cursor:wait}.tabs{display:flex;gap:8px;margin:18px 0}.tabs button{flex:1;background:#222}.tabs button.active{background:var(--pink)}
+.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}.toprow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hidden{display:none!important}.status{margin-top:13px;color:var(--green);line-height:1.5;overflow-wrap:anywhere}.error{color:#ff9eae}
+.note{font-size:12px;color:#ffb8c5;line-height:1.5;margin:16px 0 0}
+#feed{display:grid;gap:16px}.video-card{background:#151515;border:1px solid #333;border-radius:16px;overflow:hidden}
+.video-head{padding:14px 15px 8px;display:flex;justify-content:space-between;gap:12px}.video-owner{font-weight:bold}.video-date{font-size:12px;color:#999;margin-top:4px}
+video{display:block;width:100%;max-height:70vh;background:#000;object-fit:contain}
+.video-caption{padding:12px 15px 4px;line-height:1.5;white-space:pre-wrap}
+.actions{display:flex;gap:8px;padding:10px 15px 14px}.actions button{flex:0 0 auto}.comments{border-top:1px solid #333;padding:12px 15px 15px}.comment{font-size:13px;color:#ddd;margin:9px 0;line-height:1.4}.comment b{color:#fff}.comment-form{display:flex;gap:8px;margin-top:10px}.comment-form input{min-width:0;padding:10px;font-size:14px}.comment-form button{white-space:nowrap}
+.empty{text-align:center;padding:30px 12px;color:#aaa}.filehint{font-size:12px;color:#999;margin-top:7px}
+
+.profile-summary{display:flex;align-items:center;gap:14px;margin:18px 0}.avatar{width:68px;height:68px;flex:0 0 68px;border-radius:50%;display:grid;place-items:center;background:#292929;border:2px solid var(--pink);font-size:27px;font-weight:800;color:#fff}.profile-details{min-width:0}.profile-name{font-size:19px;font-weight:800;margin-bottom:5px;overflow-wrap:anywhere}.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #333;padding-top:14px;text-align:center}.profile-stats div{display:flex;flex-direction:column;gap:4px}.profile-stats strong{font-size:20px}.profile-stats span{font-size:12px;color:var(--muted)}#profileForm{border-top:1px solid #333;margin-top:16px;padding-top:8px}.my-video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.my-video-tile{aspect-ratio:1;background:#080808;border:1px solid #333;border-radius:8px;display:grid;place-items:center;color:#aaa;font-size:12px;text-align:center;padding:6px;overflow:hidden}.my-video-tile video{width:100%;height:100%;object-fit:cover}
+.user-search-list{display:grid;gap:10px;margin-top:14px}.user-result{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid #333;border-radius:12px;background:#101010}.user-result-info{min-width:0}.user-result-name{font-weight:800;overflow-wrap:anywhere}.user-result-id{font-size:12px;color:var(--muted);margin-top:3px}.user-result button{flex:0 0 auto;min-width:100px}
+
+@media(min-width:600px){main{padding-top:28px}}
+
+.feature-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 16px}
+.feature-nav button{padding:10px 6px;font-size:12px;background:#252525;border:1px solid #444}
+.feature-nav button:active{background:var(--pink)}
+.feature-actions{display:flex;flex-wrap:wrap;gap:8px;padding:0 15px 14px}
+.feature-actions button{font-size:13px;padding:9px 12px}
+.saved-grid{display:grid;gap:10px}
+.saved-item{border:1px solid #333;border-radius:12px;padding:10px;background:#101010}
+.saved-item img,.saved-item video{width:100%;max-height:320px;object-fit:contain;background:#000;border-radius:8px}
+.chat-layout{display:grid;gap:12px}
+.chat-messages{min-height:120px;max-height:340px;overflow:auto;border:1px solid #333;border-radius:12px;padding:10px;background:#0d0d0d}
+.chat-bubble{max-width:85%;padding:10px 12px;margin:8px 0;border-radius:13px;background:#252525;overflow-wrap:anywhere}
+.chat-bubble.mine{margin-left:auto;background:#8e1830}
+.chat-meta{font-size:11px;color:#bbb;margin-top:4px}
+.explore-result{padding:12px;border-bottom:1px solid #333}
+.fullscreen-btn{margin-left:auto}
+@media(min-width:600px){.feature-nav{grid-template-columns:repeat(4,1fr)}}
+
+</style>
+
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));}</script>
+</head>
+<body>
+<header>REEL <span>TAB</span></header>
+<main>
+<section id="auth" class="card">
+<h1>Welcome to REEL TAB</h1>
+<p class="muted">Create your account or sign in to join the community.</p>
+<div class="tabs"><button id="emailTab" class="active" type="button">Email</button><button id="phoneTab" class="alt" type="button">Mobile OTP</button></div>
+<div id="emailPanel">
+<label>Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+<label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters">
+<button id="signup" style="width:100%;margin-top:14px">Create account</button>
+<button id="login" class="alt" style="width:100%;margin-top:10px">Log in</button>
+<button id="reset" class="alt" style="width:100%;margin-top:10px">Forgot password?</button>
+</div>
+<div id="phonePanel" class="hidden">
+<label>Mobile number (include country code)</label><input id="phone" type="tel" placeholder="+91XXXXXXXXXX">
+<button id="sendOtp" style="width:100%;margin-top:14px">Send OTP</button>
+<label>Enter OTP</label><input id="otp" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code">
+<button id="verifyOtp" style="width:100%;margin-top:10px">Verify OTP</button>
+</div>
+<div id="authStatus" class="status" role="status"></div>
+<p class="note">Email confirmation and SMS OTP depend on your Supabase provider settings. Never share your password or OTP.</p>
+</section>
+
+<section id="app" class="hidden">
+<div class="card">
+<div class="toprow"><div><h2 style="margin-bottom:4px">Your REEL TAB</h2><div id="who" class="muted"></div></div><button id="logout" class="alt small">Log out</button></div>
+</div>
+<div class="card" id="notificationsCard">
+  <div class="toprow"><h2 style="margin:0">Notifications <span id="notificationUnread" class="muted" style="font-size:13px"></span></h2><button id="refreshNotifications" class="alt small" type="button">Refresh</button></div>
+  <div id="notificationStatus" class="status" role="status"></div>
+  <div id="notificationsList"><div class="empty">Loading notifications...</div></div>
+  <button id="markAllRead" class="alt small" type="button" style="margin-top:12px">Mark all as read</button>
+</div>
+<div class="card" id="profileCard">
+  <div class="toprow"><h2 style="margin:0">My Profile</h2><button id="editProfileBtn" class="alt small" type="button">Edit profile</button></div>
+  <div class="profile-summary">
+    <div class="avatar" id="profileAvatar">R</div>
+    <div class="profile-details"><div id="profileName" class="profile-name">Loading profile...</div><div id="profileBio" class="muted">Add a short bio about yourself.</div></div>
+  </div>
+  <div class="profile-stats"><div><strong id="postCount">0</strong><span>Posts</span></div><div><strong id="followerCount">0</strong><span>Followers</span></div><div><strong id="followingCount">0</strong><span>Following</span></div></div>
+  <form id="profileForm" class="hidden">
+    <label for="profileUsername">Username</label><input id="profileUsername" maxlength="30" autocomplete="off" placeholder="Choose a username">
+    <label for="profileBioInput">Bio</label><textarea id="profileBioInput" maxlength="160" placeholder="Write a short bio..."></textarea>
+    <div class="row"><button type="submit" id="saveProfileBtn">Save profile</button><button type="button" id="cancelProfileBtn" class="alt">Cancel</button></div>
+    <div id="profileStatus" class="status" role="status"></div>
+  </form>
+</div>
+<div class="card" id="findUsersCard">
+  <h2>Find people</h2>
+  <p class="muted">Search REEL TAB members by username and follow them.</p>
+  <form id="userSearchForm" class="row">
+    <input id="userSearchInput" maxlength="30" autocomplete="off" placeholder="Search username..." aria-label="Search username">
+    <button type="submit" class="small">Search</button>
+  </form>
+  <div id="userSearchStatus" class="status" role="status"></div>
+  <div id="userSearchResults" class="user-search-list"><div class="empty">Search for a username to find people.</div></div>
+</div>
+<div class="feature-nav" aria-label="REEL TAB features">
+  <button type="button" onclick="document.getElementById('exploreCard').scrollIntoView({behavior:'smooth'})">Explore</button>
+  <button type="button" onclick="document.getElementById('savedCard').scrollIntoView({behavior:'smooth'})">Saved</button>
+  <button type="button" onclick="document.getElementById('chatCard').scrollIntoView({behavior:'smooth'})">Messages</button>
+  <button type="button" onclick="document.getElementById('notificationsCard').scrollIntoView({behavior:'smooth'})">Alerts</button>
+</div>
+<div class="card" id="exploreCard">
+  <h2>Explore REEL TAB</h2>
+  <p class="muted">Search public member profiles and captions in recent posts.</p>
+  <form id="exploreForm" class="row"><input id="exploreInput" maxlength="80" placeholder="Search people or captions..."><button class="small" type="submit">Search</button></form>
+  <div id="exploreStatus" class="status"></div><div id="exploreResults"></div>
+</div>
+<div class="card" id="savedCard">
+  <div class="toprow"><h2 style="margin:0">Saved posts</h2><button id="refreshSaved" class="alt small" type="button">Refresh</button></div>
+  <div id="savedStatus" class="status"></div><div id="savedPosts" class="saved-grid"><div class="empty">Your saved posts will appear here.</div></div>
+</div>
+<div class="card" id="chatCard">
+  <h2>Direct messages</h2><p class="muted">Search a REEL TAB username to start a private conversation.</p>
+  <form id="chatSearchForm" class="row"><input id="chatSearchInput" maxlength="30" placeholder="Find username..."><button class="small" type="submit">Find</button></form>
+  <div id="chatStatus" class="status"></div><div id="chatPeople"></div>
+  <div id="chatPanel" class="hidden chat-layout" style="margin-top:14px">
+    <div class="toprow"><b id="chatWith">Conversation</b><button id="refreshChat" class="alt small" type="button">Refresh</button></div>
+    <div id="chatMessages" class="chat-messages"></div>
+    <form id="chatSendForm" class="comment-form"><input id="chatMessageInput" maxlength="2000" placeholder="Write a private message..." required><button type="submit">Send</button></form>
+  </div>
+</div>
+<div class="card">
+<h2>Upload a photo</h2>
+<label>Choose photo</label><input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+<div class="filehint">Choose a JPG, PNG, WEBP or GIF image. Maximum 10 MB.</div>
+<label>Caption</label><textarea id="photoCaption" maxlength="500" placeholder="Write something about your photo..."></textarea>
+<button id="photoUploadBtn" style="width:100%;margin-top:14px">Upload photo</button>
+<div id="photoUploadStatus" class="status" role="status"></div>
+</div>
+<div class="toprow" style="margin:22px 2px 12px"><h2 style="margin:0">Latest photos</h2><button id="refreshPhotos" class="alt small" type="button">Refresh</button></div>
+<div id="photoFeed"><div class="empty">Loading photos...</div></div>
+<div class="card">
+<h2>Upload a video</h2>
+<label>Choose video</label><input id="videoFile" type="file" accept="video/*">
+<div class="filehint">Select a video from your phone. Keep uploads short while testing.</div>
+<label>Caption</label><textarea id="caption" maxlength="500" placeholder="Write something about your video..."></textarea>
+<button id="uploadBtn" style="width:100%;margin-top:14px">Upload video</button>
+<div id="uploadStatus" class="status" role="status"></div>
+</div>
+<div class="toprow" style="margin:22px 2px 12px"><h2 style="margin:0">Latest videos</h2><button id="refresh" class="alt small">Refresh</button></div>
+<div id="feed"><div class="empty">Loading videos...</div></div>
+<div class="toprow" style="margin:22px 2px 12px"><h2 style="margin:0">My uploads</h2><button id="refreshProfile" class="alt small" type="button">Refresh</button></div>
+<div id="myVideos" class="my-video-grid"><div class="empty">Loading your uploads...</div></div>
+</section>
+</main>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const SUPABASE_URL = 'https://cjydpzpfqcsqsecjlwfh.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_M_SH1qSe7YEod_EHIB3X7A_KCOUv5QM';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+});
+const $ = id => document.getElementById(id);
+const say = (id,msg,isError=false) => { const el=$(id); el.textContent=msg; el.classList.toggle('error',isError); };
+let currentUser = null;
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const niceDate = value => value ? new Date(value).toLocaleString() : '';
+
+function setAuthTab(which){
+  $('emailPanel').classList.toggle('hidden',which!=='email');
+  $('phonePanel').classList.toggle('hidden',which!=='phone');
+  $('emailTab').classList.toggle('active',which==='email');
+  $('phoneTab').classList.toggle('active',which==='phone');
+  $('phoneTab').classList.toggle('alt',which!=='phone');
+  $('emailTab').classList.toggle('alt',which!=='email');
+  say('authStatus','');
+}
+$('emailTab').onclick=()=>setAuthTab('email');
+$('phoneTab').onclick=()=>setAuthTab('phone');
+
+async function emailAction(mode){
+  const email=$('email').value.trim(), password=$('password').value;
+  if(!email || password.length<8){say('authStatus','Enter a valid email and a password of at least 8 characters.',true);return;}
+  say('authStatus',mode==='signup'?'Creating your account...':'Logging in...');
+  const result=mode==='signup'
+    ? await supabase.auth.signUp({email,password,options:{emailRedirectTo:location.origin}})
+    : await supabase.auth.signInWithPassword({email,password});
+  if(result.error){say('authStatus',result.error.message,true);return;}
+  if(mode==='signup' && !result.data.session){say('authStatus','Signup request sent. Open the confirmation email, then return here and log in.');return;}
+  say('authStatus','Signed in.');
+}
+$('signup').onclick=()=>emailAction('signup');
+$('login').onclick=()=>emailAction('login');
+$('reset').onclick=async()=>{
+  const email=$('email').value.trim();
+  if(!email){say('authStatus','Enter your email address first.',true);return;}
+  const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:location.origin});
+  say('authStatus',error?error.message:'Password reset email requested. Check your inbox.',!!error);
+};
+$('sendOtp').onclick=async()=>{
+  const phone=$('phone').value.trim();
+  if(!phone){say('authStatus','Enter your phone number with country code, for example +91…',true);return;}
+  const {error}=await supabase.auth.signInWithOtp({phone});
+  say('authStatus',error?error.message:'OTP request sent if SMS is configured.',!!error);
+};
+$('verifyOtp').onclick=async()=>{
+  const phone=$('phone').value.trim(), token=$('otp').value.trim();
+  if(!phone||!token){say('authStatus','Enter your phone number and OTP.',true);return;}
+  const {error}=await supabase.auth.verifyOtp({phone,token,type:'sms'});
+  say('authStatus',error?error.message:'Phone verified.',!!error);
+};
+
+async function showSession(session){
+  currentUser=session?.user ?? null;
+  $('auth').classList.toggle('hidden',!!currentUser);
+  $('app').classList.toggle('hidden',!currentUser);
+  if(currentUser){
+    $('who').textContent=currentUser.email || currentUser.phone || 'Signed in';
+    await loadFeed();
+    await loadProfile();
+    await loadNotifications();
+    await loadSavedPosts();
+  }
+}
+$('logout').onclick=async()=>{const {error}=await supabase.auth.signOut();if(error)say('uploadStatus',error.message,true);};
+$('refresh').onclick=loadFeed;
+
+async function loadFeed(){
+  $('feed').innerHTML='<div class="empty">Loading videos...</div>';
+  const {data:videos,error}=await supabase.from('videos').select('id,user_id,video_url,caption,created_at').order('created_at',{ascending:false}).limit(30);
+  if(error){$('feed').innerHTML='<div class="empty">Could not load videos: '+esc(error.message)+'</div>';return;}
+  if(!videos?.length){$('feed').innerHTML='<div class="empty">No videos yet. Be the first to upload one!</div>';return;}
+  const userIds=[...new Set(videos.map(v=>v.user_id).filter(Boolean))];
+  const {data:profiles}=await supabase.from('profiles').select('id,username').in('id',userIds);
+  const names=new Map((profiles||[]).map(p=>[p.id,p.username]));
+  $('feed').innerHTML='';
+  for(const v of videos){
+    const {count}=await supabase.from('likes').select('*',{count:'exact',head:true}).eq('video_id',v.id);
+    const {data:mine}=await supabase.from('likes').select('video_id').eq('video_id',v.id).eq('user_id',currentUser.id).maybeSingle();
+    const {data:comments, error:commentError}=await supabase.from('comments').select('id,user_id,content,created_at').eq('video_id',v.id).order('created_at',{ascending:true}).limit(20);
+    const commentUserIds=[...new Set((comments||[]).map(c=>c.user_id).filter(Boolean))];
+    let commentNames=new Map();
+    if(commentUserIds.length){
+      const {data:cp}=await supabase.from('profiles').select('id,username').in('id',commentUserIds);
+      commentNames=new Map((cp||[]).map(p=>[p.id,p.username]));
+    }
+    const card=document.createElement('article');card.className='video-card';
+    const commentHtml=commentError?'<div class="comment">Comments unavailable.</div>':(comments||[]).map(c=>`<div class="comment"><b>${esc(commentNames.get(c.user_id)||'Member')}:</b> ${esc(c.content)}</div>`).join('')||'<div class="comment muted">No comments yet.</div>';
+    card.innerHTML=`
+      <div class="video-head"><div><div class="video-owner">${esc(names.get(v.user_id)||'REEL TAB member')}</div><div class="video-date">${esc(niceDate(v.created_at))}</div></div></div>
+      <video controls playsinline preload="metadata" src="${esc(v.video_url)}"></video>
+      <div class="video-caption">${esc(v.caption||'')}</div>
+      <div class="actions"><button class="small ${mine?'':'alt'} likeBtn">${mine?'♥ Liked':'♡ Like'} · ${count||0}</button><button class="small alt commentJump">Comment</button><button class="small alt shareBtn" type="button">↗ Share</button><button class="small alt saveBtn" type="button">🔖 Save</button><button class="small alt fullscreen-btn" type="button">⛶ Full screen</button></div>
+      <div class="comments"><div class="commentList">${commentHtml}</div><form class="comment-form"><input maxlength="500" placeholder="Write a comment..." required><button class="small">Send</button></form></div>`;
+    card.querySelector('.likeBtn').onclick=async()=>{
+      const btn=card.querySelector('.likeBtn');btn.disabled=true;
+      if(mine){
+        const {error}=await supabase.from('likes').delete().eq('video_id',v.id).eq('user_id',currentUser.id);
+        if(error)alert(error.message);
+      }else{
+        const {error}=await supabase.from('likes').insert({video_id:v.id,user_id:currentUser.id});
+        if(error)alert(error.message);
+      }
+      await loadFeed();
+    };
+    card.querySelector('.shareBtn').onclick=()=>sharePost(v.caption||'REEL TAB video',v.video_url);
+    card.querySelector('.saveBtn').onclick=()=>toggleSaved('video',v.id,card.querySelector('.saveBtn'));
+    card.querySelector('.fullscreen-btn').onclick=()=>{const el=card.querySelector('video');if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitEnterFullscreen)el.webkitEnterFullscreen();};
+    refreshSavedButton('video',v.id,card.querySelector('.saveBtn'));
+    card.querySelector('.commentJump').onclick=()=>card.querySelector('.comment-form input').focus();
+    card.querySelector('.comment-form').onsubmit=async e=>{
+      e.preventDefault();
+      const input=e.currentTarget.querySelector('input'), content=input.value.trim();
+      if(!content)return;
+      const submit=e.currentTarget.querySelector('button');submit.disabled=true;
+      const {error}=await supabase.from('comments').insert({video_id:v.id,user_id:currentUser.id,content});
+      if(error){alert(error.message);submit.disabled=false;return;}
+      await loadFeed();
+    };
+    $('feed').appendChild(card);
+  }
+}
+
+
+
+async function loadNotifications(){
+  const host=$('notificationsList');
+  host.innerHTML='<div class="empty">Loading notifications...</div>';
+  const {data:items,error}=await supabase.from('notifications').select('id,actor_id,type,message,is_read,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(40);
+  if(error){host.innerHTML='<div class="empty">Could not load notifications: '+esc(error.message)+'</div>';say('notificationStatus','Check that the notifications table and read policy are set up.',true);$('notificationUnread').textContent='';return;}
+  const unread=(items||[]).filter(n=>!n.is_read).length;
+  $('notificationUnread').textContent=unread?'('+unread+' unread)':'';
+  say('notificationStatus','');
+  if(!items?.length){host.innerHTML='<div class="empty">No notifications yet. New follows, likes and comments will appear here.</div>';return;}
+  const actorIds=[...new Set(items.map(n=>n.actor_id).filter(Boolean))];
+  let names=new Map();
+  if(actorIds.length){const {data:profiles}=await supabase.from('profiles').select('id,username').in('id',actorIds);names=new Map((profiles||[]).map(p=>[p.id,p.username]));}
+  host.innerHTML='';
+  for(const n of items){
+    const row=document.createElement('div');row.style.cssText='padding:12px 10px;border-bottom:1px solid #333;display:flex;gap:10px;align-items:flex-start;background:'+(n.is_read?'transparent':'#202027');
+    const actor=names.get(n.actor_id)||'REEL TAB member';
+    row.innerHTML=`<div style="width:9px;height:9px;border-radius:50%;background:${n.is_read?'#555':'var(--pink)'};margin-top:6px;flex:0 0 9px"></div><div style="min-width:0;flex:1"><div><b>${esc(actor)}</b> ${esc(n.message||notificationText(n.type))}</div><div class="video-date">${esc(niceDate(n.created_at))}</div></div>`;
+    if(!n.is_read){row.style.cursor='pointer';row.title='Tap to mark as read';row.onclick=async()=>{const {error}=await supabase.from('notifications').update({is_read:true}).eq('id',n.id).eq('user_id',currentUser.id);if(error){say('notificationStatus',error.message,true);return;}await loadNotifications();};}
+    host.appendChild(row);
+  }
+}
+function notificationText(type){return ({follow:'started following you',like:'liked your video',comment:'commented on your video'})[type]||'sent you a notification';}
+$('refreshNotifications').onclick=loadNotifications;
+$('markAllRead').onclick=async()=>{const {error}=await supabase.from('notifications').update({is_read:true}).eq('user_id',currentUser.id).eq('is_read',false);if(error){say('notificationStatus',error.message,true);return;}await loadNotifications();};
+
+async function ensureProfile(){
+  const {data:existing,error:readError}=await supabase.from('profiles').select('id,username,bio,avatar_url').eq('id',currentUser.id).maybeSingle();
+  if(readError){say('profileStatus','Could not load profile: '+readError.message,true);return null;}
+  if(existing) return existing;
+  const suggested=(currentUser.email||'member').split('@')[0].replace(/[^a-zA-Z0-9_]/g,'').slice(0,24) || 'member';
+  const {data:created,error}=await supabase.from('profiles').insert({id:currentUser.id,username:suggested,bio:''}).select('id,username,bio,avatar_url').single();
+  if(error){say('profileStatus','Profile setup failed: '+error.message,true);return null;}
+  return created;
+}
+
+async function loadProfile(){
+  const profile=await ensureProfile();
+  if(!profile) return;
+  const username=profile.username || (currentUser.email||'Member').split('@')[0];
+  $('profileName').textContent='@'+username;
+  $('profileBio').textContent=profile.bio || 'Add a short bio about yourself.';
+  $('profileAvatar').textContent=(username.trim()[0]||'R').toUpperCase();
+  $('profileUsername').value=profile.username||'';
+  $('profileBioInput').value=profile.bio||'';
+  const [followers,following,posts]=await Promise.all([
+    supabase.from('follows').select('id',{count:'exact',head:true}).eq('following_id',currentUser.id),
+    supabase.from('follows').select('id',{count:'exact',head:true}).eq('follower_id',currentUser.id),
+    supabase.from('videos').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id)
+  ]);
+  $('followerCount').textContent=followers.error?'—':String(followers.count||0);
+  $('followingCount').textContent=following.error?'—':String(following.count||0);
+  const photos=await supabase.from('photos').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id);
+  $('postCount').textContent=(posts.error||photos.error)?'—':String((posts.count||0)+(photos.count||0));
+  if(followers.error||following.error) say('profileStatus','Profile loaded, but follow counts could not be read. Check follows table permissions.',true);
+  await Promise.all([loadMyVideos(),loadPhotos()]);
+}
+
+async function loadMyVideos(){
+  const host=$('myVideos');
+  const [vr,pr]=await Promise.all([
+    supabase.from('videos').select('id,video_url,caption,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30),
+    supabase.from('photos').select('id,photo_url,caption,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30)
+  ]);
+  if(vr.error||pr.error){host.innerHTML='<div class="empty">Could not load uploads: '+esc((vr.error||pr.error).message)+'</div>';return;}
+  const items=[...(vr.data||[]).map(x=>({...x,kind:'video',url:x.video_url})),...(pr.data||[]).map(x=>({...x,kind:'photo',url:x.photo_url}))].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  if(!items.length){host.innerHTML='<div class="empty">You have not uploaded any photos or videos yet.</div>';return;}
+  host.innerHTML='';
+  items.forEach((item,i)=>{
+    const tile=document.createElement('div');tile.className='my-video-tile';
+    tile.innerHTML=item.kind==='video'?`<video muted playsinline preload="metadata" src="${esc(item.url)}"></video>`:`<img alt="Your photo ${i+1}" src="${esc(item.url)}" style="width:100%;height:100%;object-fit:cover">`;
+    tile.title=item.caption||('Your '+item.kind+' '+(i+1));
+    tile.onclick=()=>{const selector=item.kind==='video'?'#feed .video-card video':'#photoFeed .photo-card img';const target=[...document.querySelectorAll(selector)].find(el=>el.src===item.url);if(target)target.closest('article')?.scrollIntoView({behavior:'smooth',block:'center'});};
+    host.appendChild(tile);
+  });
+}
+
+async function loadPhotos(){
+  const host=$('photoFeed');
+  const {data:photos,error}=await supabase.from('photos').select('id,user_id,photo_url,caption,created_at').order('created_at',{ascending:false}).limit(30);
+  if(error){host.innerHTML='<div class="empty">Could not load photos: '+esc(error.message)+'<br>Make sure the photos SQL setup has been run.</div>';return;}
+  if(!photos?.length){host.innerHTML='<div class="empty">No photos yet. Be the first to share one!</div>';return;}
+  const ids=[...new Set(photos.map(p=>p.user_id).filter(Boolean))];
+  const {data:profiles}=await supabase.from('profiles').select('id,username').in('id',ids);
+  const names=new Map((profiles||[]).map(p=>[p.id,p.username]));
+  host.innerHTML='';
+  photos.forEach(p=>{
+    const card=document.createElement('article');card.className='video-card photo-card';
+    card.innerHTML=`<div class="video-head"><div><div class="video-owner">${esc(names.get(p.user_id)||'REEL TAB member')}</div><div class="video-date">${esc(niceDate(p.created_at))}</div></div></div><img src="${esc(p.photo_url)}" alt="Shared photo" loading="lazy" style="display:block;width:100%;max-height:75vh;object-fit:contain;background:#000"><div class="video-caption">${esc(p.caption||'')}</div><div class="feature-actions"><button class="alt sharePhoto" type="button">↗ Share</button><button class="alt savePhoto" type="button">🔖 Save</button></div>`;
+    card.querySelector('.sharePhoto').onclick=()=>sharePost(p.caption||'REEL TAB photo',p.photo_url);
+    card.querySelector('.savePhoto').onclick=()=>toggleSaved('photo',p.id,card.querySelector('.savePhoto'));
+    refreshSavedButton('photo',p.id,card.querySelector('.savePhoto'));
+    host.appendChild(card);
+  });
+}
+
+$('editProfileBtn').onclick=()=>{
+  $('profileForm').classList.remove('hidden');
+  $('profileUsername').focus();
+};
+$('cancelProfileBtn').onclick=()=>{$('profileForm').classList.add('hidden');say('profileStatus','');};
+$('profileForm').onsubmit=async e=>{
+  e.preventDefault();
+  const username=$('profileUsername').value.trim().replace(/^@/,'');
+  const bio=$('profileBioInput').value.trim();
+  if(!/^[a-zA-Z0-9_]{3,30}$/.test(username)){say('profileStatus','Username must be 3–30 characters: letters, numbers or underscore.',true);return;}
+  const btn=$('saveProfileBtn');btn.disabled=true;say('profileStatus','Saving profile...');
+  const {error}=await supabase.from('profiles').update({username,bio}).eq('id',currentUser.id);
+  btn.disabled=false;
+  if(error){say('profileStatus','Could not save profile: '+error.message,true);return;}
+  say('profileStatus','Profile saved successfully.');
+  await loadProfile();
+  $('profileForm').classList.add('hidden');
+};
+$('refreshProfile').onclick=loadProfile;
+$('refreshPhotos').onclick=loadPhotos;
+
+async function searchUsers(term){
+  const host=$('userSearchResults');
+  const query=term.trim().replace(/^@/,'');
+  if(!query){say('userSearchStatus','Enter a username to search.',true);host.innerHTML='<div class="empty">Search for a username to find people.</div>';return;}
+  say('userSearchStatus','Searching...');
+  host.innerHTML='';
+  const {data:users,error}=await supabase.from('profiles').select('id,username,bio').ilike('username','%'+query+'%').neq('id',currentUser.id).order('username').limit(20);
+  if(error){say('userSearchStatus','Search failed: '+error.message,true);return;}
+  if(!users?.length){say('userSearchStatus','No other members found for that username.');host.innerHTML='<div class="empty">No matching members yet.</div>';return;}
+  say('userSearchStatus',users.length+' member(s) found.');
+  const {data:mine,error:followError}=await supabase.from('follows').select('following_id').eq('follower_id',currentUser.id);
+  if(followError){say('userSearchStatus','Members found, but follow status could not be loaded: '+followError.message,true);return;}
+  const followingSet=new Set((mine||[]).map(x=>x.following_id));
+  for(const user of users){
+    const row=document.createElement('div');row.className='user-result';
+    const isFollowing=followingSet.has(user.id);
+    row.innerHTML=`<div class="user-result-info"><div class="user-result-name">@${esc(user.username||'member')}</div><div class="user-result-id">${esc(user.bio||'REEL TAB member')}</div></div><button type="button" class="small ${isFollowing?'alt':''}">${isFollowing?'Following':'Follow'}</button>`;
+    const btn=row.querySelector('button');
+    btn.onclick=async()=>{
+      btn.disabled=true;
+      if(followingSet.has(user.id)){
+        const {error}=await supabase.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',user.id);
+        if(error){alert('Unfollow failed: '+error.message);btn.disabled=false;return;}
+        followingSet.delete(user.id);
+      }else{
+        const {error}=await supabase.from('follows').insert({follower_id:currentUser.id,following_id:user.id});
+        if(error){alert('Follow failed: '+error.message);btn.disabled=false;return;}
+        followingSet.add(user.id);
+      }
+      await Promise.all([loadProfile(),searchUsers(query)]);
+    };
+    host.appendChild(row);
+  }
+}
+$('userSearchForm').onsubmit=async e=>{e.preventDefault();await searchUsers($('userSearchInput').value);};
+$('userSearchInput').addEventListener('keydown',e=>{if(e.key==='Escape'){$('userSearchInput').value='';$('userSearchResults').innerHTML='<div class="empty">Search for a username to find people.</div>';say('userSearchStatus','');}});
+
+$('photoUploadBtn').onclick=async()=>{
+  const file=$('photoFile').files[0], caption=$('photoCaption').value.trim();
+  if(!file){say('photoUploadStatus','Please choose a photo first.',true);return;}
+  if(!file.type.startsWith('image/')){say('photoUploadStatus','Please select a valid image file.',true);return;}
+  if(file.size>10*1024*1024){say('photoUploadStatus','Photo must be 10 MB or smaller.',true);return;}
+  if(!currentUser){say('photoUploadStatus','Please log in again.',true);return;}
+  const btn=$('photoUploadBtn');btn.disabled=true;say('photoUploadStatus','Uploading photo...');
+  const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  const path=`${currentUser.id}/${Date.now()}-${safeName}`;
+  const {error:uploadError}=await supabase.storage.from('photos').upload(path,file,{upsert:false,contentType:file.type});
+  if(uploadError){say('photoUploadStatus','Photo upload failed: '+uploadError.message,true);btn.disabled=false;return;}
+  const {data:urlData}=supabase.storage.from('photos').getPublicUrl(path);
+  const {error:dbError}=await supabase.from('photos').insert({user_id:currentUser.id,photo_url:urlData.publicUrl,caption});
+  if(dbError){say('photoUploadStatus','Photo file uploaded, but saving its post failed: '+dbError.message,true);btn.disabled=false;return;}
+  $('photoFile').value='';$('photoCaption').value='';say('photoUploadStatus','Photo uploaded successfully.');
+  btn.disabled=false;await Promise.all([loadPhotos(),loadProfile()]);
+};
+
+$('uploadBtn').onclick=async()=>{
+  const file=$('videoFile').files[0], caption=$('caption').value.trim();
+  if(!file){say('uploadStatus','Please choose a video first.',true);return;}
+  if(!file.type.startsWith('video/')){say('uploadStatus','Please select a valid video file.',true);return;}
+  if(!currentUser){say('uploadStatus','Please log in again.',true);return;}
+  const btn=$('uploadBtn');btn.disabled=true;say('uploadStatus','Uploading video...');
+  const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  const path=`${currentUser.id}/${Date.now()}-${safeName}`;
+  const {error:uploadError}=await supabase.storage.from('videos').upload(path,file,{upsert:false,contentType:file.type});
+  if(uploadError){say('uploadStatus','Upload failed: '+uploadError.message,true);btn.disabled=false;return;}
+  const {data:urlData}=supabase.storage.from('videos').getPublicUrl(path);
+  const {error:dbError}=await supabase.from('videos').insert({user_id:currentUser.id,video_url:urlData.publicUrl,caption});
+  if(dbError){
+    say('uploadStatus','Video file uploaded, but saving its post failed: '+dbError.message,true);
+    btn.disabled=false;return;
+  }
+  $('videoFile').value='';$('caption').value='';say('uploadStatus','Video uploaded successfully.');
+  btn.disabled=false;await loadFeed();
+};
+
+
+// Share, saved posts, Explore, and private messages.
+async function sharePost(title,url){
+  const shareData={title:'REEL TAB',text:title+' — on REEL TAB',url:location.href};
+  try{if(navigator.share){await navigator.share(shareData);}else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(location.href);alert('REEL TAB link copied.');}else{prompt('Copy REEL TAB link:',location.href);}}
+  catch(e){if(e.name!=='AbortError')alert('Could not share: '+e.message);}
+}
+async function refreshSavedButton(type,id,button){
+  const {data,error}=await supabase.from('saved_posts').select('id').eq('user_id',currentUser.id).eq('post_type',type).eq('post_id',id).maybeSingle();
+  if(!error){button.textContent=data?'✓ Saved':'🔖 Save';button.classList.toggle('alt',!!data);}
+}
+async function toggleSaved(type,id,button){
+  button.disabled=true;
+  const {data,error:readError}=await supabase.from('saved_posts').select('id').eq('user_id',currentUser.id).eq('post_type',type).eq('post_id',id).maybeSingle();
+  if(readError){alert('Saved posts: '+readError.message);button.disabled=false;return;}
+  const result=data?await supabase.from('saved_posts').delete().eq('id',data.id).eq('user_id',currentUser.id):await supabase.from('saved_posts').insert({user_id:currentUser.id,post_type:type,post_id:id});
+  button.disabled=false;
+  if(result.error){alert('Could not update saved post: '+result.error.message);return;}
+  await refreshSavedButton(type,id,button);await loadSavedPosts();
+}
+async function loadSavedPosts(){
+  const host=$('savedPosts');host.innerHTML='<div class="empty">Loading saved posts...</div>';
+  const {data:saves,error}=await supabase.from('saved_posts').select('id,post_type,post_id,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(100);
+  if(error){host.innerHTML='<div class="empty">Could not load saved posts: '+esc(error.message)+'</div>';return;}
+  if(!saves?.length){host.innerHTML='<div class="empty">No saved posts yet. Tap Save on a photo or video.</div>';return;}
+  host.innerHTML='';
+  for(const s of saves){
+    const table=s.post_type==='video'?'videos':'photos';
+    const fields=s.post_type==='video'?'id,caption,video_url,created_at':'id,caption,photo_url,created_at';
+    const {data:p,error:e}=await supabase.from(table).select(fields).eq('id',s.post_id).maybeSingle();
+    if(e||!p)continue;
+    const item=document.createElement('div');item.className='saved-item';
+    item.innerHTML=(s.post_type==='video'?`<video controls playsinline preload="metadata" src="${esc(p.video_url)}"></video>`:`<img loading="lazy" src="${esc(p.photo_url)}" alt="Saved photo">`)+`<div class="video-caption">${esc(p.caption||'')}</div><div class="feature-actions"><button class="alt removeSaved" type="button">Remove saved</button><button class="alt shareSaved" type="button">↗ Share</button></div>`;
+    item.querySelector('.removeSaved').onclick=async()=>{const {error}=await supabase.from('saved_posts').delete().eq('id',s.id).eq('user_id',currentUser.id);if(error)alert(error.message);else loadSavedPosts();};
+    item.querySelector('.shareSaved').onclick=()=>sharePost(p.caption||'REEL TAB post',location.href);
+    host.appendChild(item);
+  }
+  if(!host.children.length)host.innerHTML='<div class="empty">The saved posts are no longer available.</div>';
+}
+$('refreshSaved').onclick=loadSavedPosts;
+async function exploreSearch(term){
+  const q=term.trim();const host=$('exploreResults');host.innerHTML='';
+  if(!q){say('exploreStatus','Type a username or caption to search.',true);return;}
+  say('exploreStatus','Searching REEL TAB...');
+  const [users,videos,photos]=await Promise.all([
+    supabase.from('profiles').select('id,username,bio').ilike('username','%'+q+'%').limit(10),
+    supabase.from('videos').select('id,caption,created_at').ilike('caption','%'+q+'%').order('created_at',{ascending:false}).limit(10),
+    supabase.from('photos').select('id,caption,created_at').ilike('caption','%'+q+'%').order('created_at',{ascending:false}).limit(10)
+  ]);
+  const err=users.error||videos.error||photos.error;if(err){say('exploreStatus','Search error: '+err.message,true);return;}
+  let total=0;
+  (users.data||[]).forEach(u=>{const row=document.createElement('div');row.className='explore-result';row.innerHTML=`<b>@${esc(u.username||'member')}</b><div class="muted">${esc(u.bio||'REEL TAB member')}</div>`;host.appendChild(row);total++;});
+  [...(videos.data||[]).map(x=>({...x,kind:'video'})),...(photos.data||[]).map(x=>({...x,kind:'photo'}))].forEach(p=>{const row=document.createElement('div');row.className='explore-result';row.innerHTML=`<b>${p.kind==='video'?'Video':'Photo'} post</b><div>${esc(p.caption||'')}</div><div class="video-date">${esc(niceDate(p.created_at))}</div>`;host.appendChild(row);total++;});
+  say('exploreStatus',total?`${total} result(s) found.`:'No matching profiles or captions found.');
+}
+$('exploreForm').onsubmit=e=>{e.preventDefault();exploreSearch($('exploreInput').value);};
+let activeChatUser=null;
+async function findChatPeople(term){
+  const q=term.trim().replace(/^@/,'');const host=$('chatPeople');host.innerHTML='';
+  if(!q){say('chatStatus','Enter a username to search.',true);return;}
+  const {data:users,error}=await supabase.from('profiles').select('id,username,bio').ilike('username','%'+q+'%').neq('id',currentUser.id).limit(15);
+  if(error){say('chatStatus','Search failed: '+error.message,true);return;}
+  if(!users?.length){say('chatStatus','No matching members found.');return;}
+  say('chatStatus',`${users.length} member(s) found.`);
+  users.forEach(u=>{const row=document.createElement('div');row.className='user-result';row.innerHTML=`<div class="user-result-info"><div class="user-result-name">@${esc(u.username||'member')}</div><div class="user-result-id">${esc(u.bio||'REEL TAB member')}</div></div><button class="small" type="button">Message</button>`;row.querySelector('button').onclick=()=>openChat(u);host.appendChild(row);});
+}
+async function openChat(user){activeChatUser=user;$('chatPanel').classList.remove('hidden');$('chatWith').textContent='@'+(user.username||'member');await loadChatMessages();}
+async function loadChatMessages(){
+  if(!activeChatUser)return;const host=$('chatMessages');host.innerHTML='<div class="empty">Loading messages...</div>';
+  const {data:items,error}=await supabase.from('direct_messages').select('id,sender_id,recipient_id,content,created_at').or(`and(sender_id.eq.${currentUser.id},recipient_id.eq.${activeChatUser.id}),and(sender_id.eq.${activeChatUser.id},recipient_id.eq.${currentUser.id})`).order('created_at',{ascending:true}).limit(100);
+  if(error){host.innerHTML='<div class="empty">Could not load chat: '+esc(error.message)+'</div>';return;}
+  if(!items?.length){host.innerHTML='<div class="empty">No messages yet. Say hello!</div>';return;}
+  host.innerHTML='';items.forEach(m=>{const b=document.createElement('div');b.className='chat-bubble '+(m.sender_id===currentUser.id?'mine':'');b.innerHTML=`${esc(m.content)}<div class="chat-meta">${esc(niceDate(m.created_at))}</div>`;host.appendChild(b);});host.scrollTop=host.scrollHeight;
+}
+$('chatSearchForm').onsubmit=e=>{e.preventDefault();findChatPeople($('chatSearchInput').value);};
+$('refreshChat').onclick=loadChatMessages;
+$('chatSendForm').onsubmit=async e=>{e.preventDefault();if(!activeChatUser)return;const input=$('chatMessageInput');const content=input.value.trim();if(!content)return;const btn=e.currentTarget.querySelector('button');btn.disabled=true;const {error}=await supabase.from('direct_messages').insert({sender_id:currentUser.id,recipient_id:activeChatUser.id,content});btn.disabled=false;if(error){say('chatStatus','Message failed: '+error.message,true);return;}input.value='';await loadChatMessages();};
+
+supabase.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>showSession(session),0);});
+const {data:{session}}=await supabase.auth.getSession();
+await showSession(session);
+</script>
+</body>
+</html>
